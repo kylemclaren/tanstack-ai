@@ -926,6 +926,39 @@ export interface RunStartedEvent extends AGUIRunStartedEvent {
 }
 
 /**
+ * Provider-reported cost breakdown for a single request, normalized onto a
+ * canonical shape so consumer code is portable across gateways. Each adapter's
+ * extractor maps its provider-specific wire keys (e.g. OpenRouter's
+ * `upstream_inference_prompt_cost`, `upstream_inference_input_cost`) onto these
+ * fields at runtime.
+ */
+export interface UsageCostBreakdown {
+  /** Total cost the gateway paid the upstream provider. */
+  upstreamCost?: number
+  /** Upstream cost for input (prompt) tokens. */
+  upstreamInputCost?: number
+  /** Upstream cost for output (completion) tokens. */
+  upstreamOutputCost?: number
+}
+
+/**
+ * Token usage totals for a run, optionally including provider-reported cost.
+ *
+ * `cost` and `costDetails` are populated only by adapters whose provider returns
+ * authoritative per-request cost (e.g. OpenRouter). They are absent for adapters
+ * that do not report cost, so consumers must treat them as optional.
+ */
+export interface UsageTotals {
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+  /** Provider-reported cost for the request, when available. */
+  cost?: number
+  /** Provider-reported cost breakdown, when available. */
+  costDetails?: UsageCostBreakdown
+}
+
+/**
  * Emitted when a run completes successfully.
  *
  * @ag-ui/core provides: `threadId`, `runId`, `result?`
@@ -936,12 +969,8 @@ export interface RunFinishedEvent extends AGUIRunFinishedEvent {
   model?: string
   /** Why the generation stopped */
   finishReason?: 'stop' | 'length' | 'content_filter' | 'tool_calls' | null
-  /** Token usage statistics */
-  usage?: {
-    promptTokens: number
-    completionTokens: number
-    totalTokens: number
-  }
+  /** Token usage statistics, optionally including provider-reported cost. */
+  usage?: UsageTotals
 }
 
 /**
