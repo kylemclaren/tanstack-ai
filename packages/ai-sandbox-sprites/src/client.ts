@@ -97,7 +97,11 @@ export interface SpritesClientLike {
   restoreCheckpoint: (
     name: string,
     id: string,
-    options?: { signal?: AbortSignal; readyTimeoutMs?: number; probePath?: string },
+    options?: {
+      signal?: AbortSignal
+      readyTimeoutMs?: number
+      probePath?: string
+    },
   ) => Promise<void>
 }
 
@@ -241,8 +245,14 @@ export class SpritesClient implements SpritesClientLike {
   }
 
   async fsRead(name: string, path: string): Promise<Uint8Array> {
-    const url = this.spritePath(name, `/fs/read?path=${encodeURIComponent(path)}`)
-    const response = await fetch(url, { method: 'GET', headers: this.headers() })
+    const url = this.spritePath(
+      name,
+      `/fs/read?path=${encodeURIComponent(path)}`,
+    )
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: this.headers(),
+    })
     if (!response.ok) await this.fail('GET', url, response)
     return new Uint8Array(await response.arrayBuffer())
   }
@@ -263,8 +273,14 @@ export class SpritesClient implements SpritesClientLike {
   }
 
   async fsList(name: string, path: string): Promise<Array<SpriteFsEntry>> {
-    const url = this.spritePath(name, `/fs/list?path=${encodeURIComponent(path)}`)
-    const response = await fetch(url, { method: 'GET', headers: this.headers() })
+    const url = this.spritePath(
+      name,
+      `/fs/list?path=${encodeURIComponent(path)}`,
+    )
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: this.headers(),
+    })
     if (!response.ok) await this.fail('GET', url, response)
     const body = (await response.json()) as {
       entries?: Array<{ name?: unknown; path?: unknown; isDir?: unknown }>

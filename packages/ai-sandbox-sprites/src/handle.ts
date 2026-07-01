@@ -120,7 +120,9 @@ export class SpritesHandle implements SandboxHandle {
 
     this.fs = {
       read: async (p) =>
-        new TextDecoder().decode(await this.client.fsRead(this.name, this.abs(p))),
+        new TextDecoder().decode(
+          await this.client.fsRead(this.name, this.abs(p)),
+        ),
       readBytes: (p) => this.client.fsRead(this.name, this.abs(p)),
       write: (p, data) =>
         this.client.fsWrite(
@@ -260,7 +262,10 @@ export class SpritesHandle implements SandboxHandle {
     const version = await this.client.createCheckpoint(this.name, {
       ...(label !== undefined ? { comment: label } : {}),
     })
-    return { id: `${this.name}#${version}`, ...(label !== undefined ? { label } : {}) }
+    return {
+      id: `${this.name}#${version}`,
+      ...(label !== undefined ? { label } : {}),
+    }
   }
 
   /** List this Sprite's checkpoints (newest live overlay shows as `Current`). */

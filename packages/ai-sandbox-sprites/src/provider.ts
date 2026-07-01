@@ -76,10 +76,7 @@ class SpritesProvider implements SandboxProvider {
     return this.config.urlAuth ?? 'public'
   }
 
-  private handle(sprite: {
-    name: string
-    url: string
-  }): SpritesHandle {
+  private handle(sprite: { name: string; url: string }): SpritesHandle {
     return new SpritesHandle({
       client: this.client,
       name: sprite.name,

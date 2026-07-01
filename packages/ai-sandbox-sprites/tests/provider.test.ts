@@ -57,9 +57,12 @@ function installFetch(s: ProviderScenario = {}): void {
     if (get && method === 'GET') {
       const status = s.getStatus ?? 200
       if (status >= 400) return new Response('err', { status })
-      return new Response(JSON.stringify(sprite(decodeURIComponent(get[1] ?? ''))), {
-        status,
-      })
+      return new Response(
+        JSON.stringify(sprite(decodeURIComponent(get[1] ?? ''))),
+        {
+          status,
+        },
+      )
     }
     if (get && method === 'PUT') return new Response('', { status: 200 })
     if (get && method === 'DELETE') return new Response(null, { status: 204 })

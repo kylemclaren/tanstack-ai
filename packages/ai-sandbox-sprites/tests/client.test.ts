@@ -6,8 +6,7 @@ const enc = new TextEncoder()
 
 /** Encode a `[type][payload]` binary exec frame as an ArrayBuffer. */
 function frame(type: number, payload: string | Array<number>): ArrayBuffer {
-  const body =
-    typeof payload === 'string' ? [...enc.encode(payload)] : payload
+  const body = typeof payload === 'string' ? [...enc.encode(payload)] : payload
   return new Uint8Array([type, ...body]).buffer
 }
 
@@ -79,7 +78,10 @@ afterEach(() => {
 })
 
 function client(): SpritesClient {
-  return new SpritesClient({ apiKey: 'org/1/tid/secret', baseUrl: 'https://api.test' })
+  return new SpritesClient({
+    apiKey: 'org/1/tid/secret',
+    baseUrl: 'https://api.test',
+  })
 }
 
 describe('SpritesClient.exec', () => {
@@ -135,7 +137,9 @@ describe('SpritesClient.exec', () => {
     sock.open()
     sock.message(frame(1, 'partial'))
     sock.fireClose()
-    await expect(proc.wait()).rejects.toThrow(/before the process reported an exit/i)
+    await expect(proc.wait()).rejects.toThrow(
+      /before the process reported an exit/i,
+    )
   })
 
   it('kill() POSTs the kill endpoint with the session id, then wait() resolves 137', async () => {
@@ -175,7 +179,10 @@ describe('SpritesClient.exec', () => {
 
     const controller = new AbortController()
     const c = client()
-    const proc = c.exec('sb', { argv: ['sleep', '100'], signal: controller.signal })
+    const proc = c.exec('sb', {
+      argv: ['sleep', '100'],
+      signal: controller.signal,
+    })
     const sock = StubWebSocket.last as StubWebSocket
     sock.open()
     // Abort BEFORE session_info arrives…
@@ -187,9 +194,7 @@ describe('SpritesClient.exec', () => {
     await expect(proc.wait()).rejects.toThrow()
     // give the deferred kill a tick
     await new Promise((r) => setTimeout(r, 0))
-    expect(
-      fetchCalls.some((c2) => c2.url.endsWith('/exec/42/kill')),
-    ).toBe(true)
+    expect(fetchCalls.some((c2) => c2.url.endsWith('/exec/42/kill'))).toBe(true)
   })
 })
 
@@ -204,7 +209,10 @@ describe('SpritesClient.createCheckpoint', () => {
         listCount += 1
         const list =
           listCount === 1
-            ? [{ id: 'Current', is_auto: false }, { id: 'v1', is_auto: false }]
+            ? [
+                { id: 'Current', is_auto: false },
+                { id: 'v1', is_auto: false },
+              ]
             : [
                 { id: 'Current', is_auto: false },
                 { id: 'v1', is_auto: false },
@@ -213,9 +221,12 @@ describe('SpritesClient.createCheckpoint', () => {
         return jsonResponse(list)
       }
       if (u.pathname.endsWith('/checkpoint') && method === 'POST') {
-        return new Response('{"type":"info","data":"Checkpoint v2 created"}\n', {
-          status: 200,
-        })
+        return new Response(
+          '{"type":"info","data":"Checkpoint v2 created"}\n',
+          {
+            status: 200,
+          },
+        )
       }
       return new Response('nope', { status: 404 })
     })
@@ -264,7 +275,11 @@ describe('SpritesClient lifecycle', () => {
 
     const c = client()
     const sprite = await c.createSprite('sb')
-    expect(sprite).toMatchObject({ name: 'sb', url: 'https://sb-x.sprites.app', urlAuth: 'public' })
+    expect(sprite).toMatchObject({
+      name: 'sb',
+      url: 'https://sb-x.sprites.app',
+      urlAuth: 'public',
+    })
     await expect(c.deleteSprite('gone')).resolves.toBeUndefined()
   })
 })
